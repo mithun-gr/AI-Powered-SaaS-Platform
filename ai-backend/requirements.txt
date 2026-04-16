@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+qdrant-client
+llama-index-core
+llama-index-vector-stores-qdrant
+llama-index-llms-groq
+llama-index-embeddings-huggingface
+beautifulsoup4
+playwright
+pydantic
+python-dotenv
+supabase
+aiosqlite
