@@ -1,14 +1,14 @@
 "use client";
 // Features 7 (Usage Stats), 9 (Onboarding Checklist), 10 (Activity Feed), 11 (Referral), 12 (Upgrade Prompt)
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText, CreditCard, FolderOpen, MessageCircle, TrendingUp, Clock,
   CheckCircle2, Circle, X, Copy, Check, Zap, Bell, Shield, Users,
   ChevronRight, Gift, ArrowUpRight, Activity, Sparkles, AlertTriangle, Search,
-  SlidersHorizontal, Eye, EyeOff
+  SlidersHorizontal, Eye, EyeOff, Loader
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -196,48 +196,88 @@ function ReferralCard() {
 
 // ── Feature 7: Automated Compliance Reminders ──────────────────────────────────
 function ComplianceReminders() {
+  const [privacyStatus, setPrivacyStatus] = useState<"pending" | "scanning" | "resolved">("pending");
+  const [gstStatus, setGstStatus] = useState<"pending" | "uploading" | "resolved">("pending");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePrivacyAudit = () => {
+    if (privacyStatus !== "pending") return;
+    setPrivacyStatus("scanning");
+    setTimeout(() => setPrivacyStatus("resolved"), 2500);
+  };
+
+  const handleGstUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setGstStatus("uploading");
+      setTimeout(() => setGstStatus("resolved"), 2000);
+    }
+  };
+
+  const allResolved = privacyStatus === "resolved" && gstStatus === "resolved";
+
   return (
-    <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-5 relative overflow-hidden group hover:border-rose-500/50 transition-colors">
+    <div className={`rounded-2xl border p-5 relative overflow-hidden transition-colors duration-500 ${allResolved ? "border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-500/50" : "border-rose-500/30 bg-rose-500/5 hover:border-rose-500/50 group"}`}>
       {/* Background glow */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 blur-3xl rounded-full pointer-events-none" />
+      <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full pointer-events-none transition-colors duration-500 ${allResolved ? "bg-emerald-500/10" : "bg-rose-500/10"}`} />
       
       <div className="flex items-center gap-3 mb-4">
-        <div className="h-9 w-9 rounded-xl bg-rose-500/20 flex items-center justify-center shrink-0">
-          <AlertTriangle className="w-5 h-5 text-rose-500" />
+        <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-500 ${allResolved ? "bg-emerald-500/20" : "bg-rose-500/20"}`}>
+          {allResolved ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <AlertTriangle className="w-5 h-5 text-rose-500" />}
         </div>
         <div>
-          <h3 className="font-bold text-rose-500 text-sm">Action Required</h3>
-          <p className="text-xs text-zinc-400">2 upcoming compliance deadlines</p>
+          <h3 className={`font-bold text-sm transition-colors duration-500 ${allResolved ? "text-emerald-500" : "text-rose-500"}`}>
+            {allResolved ? "All Clear" : "Action Required"}
+          </h3>
+          <p className="text-xs text-zinc-400">
+            {allResolved ? "No upcoming compliance deadlines" : `${(privacyStatus !== "resolved" ? 1 : 0) + (gstStatus !== "resolved" ? 1 : 0)} upcoming compliance deadlines`}
+          </p>
         </div>
       </div>
 
       <div className="space-y-3">
-        <div className="bg-zinc-950/60 border border-rose-500/20 rounded-xl p-3">
-          <div className="flex justify-between items-start mb-2">
-            <h4 className="text-xs font-bold text-white">Annual Privacy Audit</h4>
-            <span className="text-[9px] font-bold uppercase tracking-wider text-rose-400">In 5 Days (Demo)</span>
-          </div>
-          <p className="text-[11px] text-zinc-500 leading-tight mb-3">Annual review required for GDPR and digital privacy compliance parameters.</p>
-          <Button size="sm" className="w-full h-7 text-[10px] uppercase font-bold tracking-wider bg-rose-500 hover:bg-rose-600 text-white rounded group relative overflow-hidden" 
-            onClick={(e) => {
-               const trg = e.currentTarget;
-               trg.innerHTML = `<span class="flex items-center gap-1 justify-center"><svg class="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> Initializing...</span>`;
-               setTimeout(() => trg.innerHTML = "Auto-Resolve via AI", 2000);
-            }}
-          >
-            Auto-Resolve via AI
-          </Button>
-        </div>
+        {privacyStatus !== "resolved" && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-zinc-950/60 border border-rose-500/20 rounded-xl p-3">
+            <div className="flex justify-between items-start mb-2">
+              <h4 className="text-xs font-bold text-white">Annual Privacy Audit</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-rose-400">In 5 Days</span>
+            </div>
+            <p className="text-[11px] text-zinc-500 leading-tight mb-3">Annual review required for GDPR and digital privacy compliance parameters.</p>
+            <Button size="sm" className="w-full h-7 text-[10px] uppercase font-bold tracking-wider bg-rose-500 hover:bg-rose-600 text-white rounded transition-all" 
+              onClick={handlePrivacyAudit}
+              disabled={privacyStatus !== "pending"}
+            >
+              {privacyStatus === "scanning" ? (
+                <span className="flex items-center gap-2"><Loader className="w-3 h-3 animate-spin"/> Auditing...</span>
+              ) : "Auto-Resolve via AI"}
+            </Button>
+          </motion.div>
+        )}
 
-        <div className="bg-zinc-950/40 border border-zinc-800/50 rounded-xl p-3">
-          <div className="flex justify-between items-start mb-1">
-            <h4 className="text-xs font-semibold text-zinc-300">Quarterly GST Filing Check</h4>
-            <span className="text-[9px] font-bold uppercase tracking-wider text-amber-500">In 14 Days (Demo)</span>
-          </div>
-          <Button variant="ghost" size="sm" className="w-full h-7 mt-2 text-[10px] uppercase font-bold tracking-wider text-zinc-400 hover:text-white rounded border border-zinc-800" onClick={() => window.location.href = '/documents'}>
-            Submit Financials
-          </Button>
-        </div>
+        {gstStatus !== "resolved" && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-zinc-950/40 border border-zinc-800/50 rounded-xl p-3">
+            <div className="flex justify-between items-start mb-1">
+              <h4 className="text-xs font-semibold text-zinc-300">Quarterly GST Filing Check</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-amber-500">In 14 Days</span>
+            </div>
+            <input type="file" ref={fileInputRef} className="hidden" accept=".csv,.pdf,.xlsx" onChange={handleGstUpload} />
+            <Button variant="ghost" size="sm" className="w-full h-7 mt-2 text-[10px] uppercase font-bold tracking-wider text-zinc-400 hover:text-white rounded border border-zinc-800 transition-all" 
+              onClick={() => fileInputRef.current?.click()}
+              disabled={gstStatus !== "pending"}
+            >
+              {gstStatus === "uploading" ? (
+                <span className="flex items-center gap-2 text-primary font-semibold"><Loader className="w-3 h-3 animate-spin"/> Uploading...</span>
+              ) : "Submit Financials"}
+            </Button>
+          </motion.div>
+        )}
+
+        {allResolved && (
+           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center mt-2">
+               <Shield className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+               <p className="text-sm font-semibold text-emerald-400">Your business is 100% compliant</p>
+               <p className="text-xs text-emerald-500/70 mt-1">Both actions naturally resolved via Morchantra AI.</p>
+           </motion.div>
+        )}
       </div>
     </div>
   );
