@@ -63,12 +63,16 @@ function Label({ children }: { children: React.ReactNode }) {
 
 // ── Feature 8: Dark / Light Mode Toggle ──────────────────────────────────────
 function useDarkMode(): [boolean, () => void] {
-  const [dark, setDark] = useState(() => {
-    if (typeof window === "undefined") return true;
+  const [dark, setDark] = useState(true);
+
+  useEffect(() => {
     const saved = localStorage.getItem("mrc_theme");
-    if (saved) return saved === "dark";
-    return document.documentElement.classList.contains("dark");
-  });
+    if (saved) {
+      setDark(saved === "dark");
+    } else {
+      setDark(document.documentElement.classList.contains("dark"));
+    }
+  }, []);
 
   const toggle = () => {
     const next = !dark;
