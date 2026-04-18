@@ -86,37 +86,14 @@ export function AccessibilityPanel() {
 
     return (
         <>
-            {/* Trigger Tab - Fully Draggable (Omni-directional) */}
             {mounted && (
-                <motion.div
-                    ref={dragButtonRef}
-                    drag="y"
-                    dragConstraints={{ top: -300, bottom: 300 }}
-                    dragMomentum={false}
-                    onDragStart={() => setIsDragging(true)}
-                    onDragEnd={() => setIsDragging(false)}
-                    style={{ left: 0, top: "30vh", position: 'fixed' }}
-                    initial={{ scale: 0, opacity: 0, x: -50 }}
-                    animate={{ scale: 1, opacity: 1, x: 0 }}
-                    whileHover={{ scale: 1.05, x: 5 }}
-                    whileTap={{ scale: 0.95, cursor: "grabbing" }}
-                    className={cn(
-                        "z-[60] flex flex-row items-center justify-center gap-2 py-3 px-4 pr-5 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 border-l-0 rounded-r-3xl shadow-[5px_0px_30px_rgba(0,0,0,0.5)] transition-colors hover:border-primary/50 group cursor-grab",
-                        isOpen && "hidden"
-                    )}
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="w-full group flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-all text-gray-400 hover:bg-secondary hover:text-white"
                 >
-                    <div onClick={() => !isDragging && setIsOpen(true)} className="flex items-center gap-2 select-none">
-                        <div className="flex flex-col gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity mr-1">
-                            <div className="w-0.5 h-0.5 rounded-full bg-white" />
-                            <div className="w-0.5 h-0.5 rounded-full bg-white" />
-                            <div className="w-0.5 h-0.5 rounded-full bg-white" />
-                        </div>
-                        <Settings2 className="h-4 w-4 text-primary transition-transform group-hover:rotate-45" />
-                        <span className="text-[10px] uppercase font-black text-white tracking-widest">
-                            Display
-                        </span>
-                    </div>
-                </motion.div>
+                    <Settings2 className="mr-3 flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-white" />
+                    Display
+                </button>
             )}
 
             {/* Panel Drawer */}

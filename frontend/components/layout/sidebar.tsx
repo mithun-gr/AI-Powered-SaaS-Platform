@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAuthSession } from "@/lib/auth-session";
+import { AccessibilityPanel } from "@/components/accessibility-panel";
 import {
     LayoutDashboard,
     FileText,
@@ -182,6 +183,9 @@ export function Sidebar({ isAdmin = false, isMobileOpen = false, onMobileClose }
                     {/* Navigation */}
                     <nav className="flex-1 px-3 pt-4 pb-8 space-y-1 overflow-y-auto">
                         <NavItems menuItems={menuItems} pathname={pathname} />
+                        <div className="pt-2 mt-2 border-t border-zinc-800">
+                           <AccessibilityPanel />
+                        </div>
                     </nav>
 
                     {/* Footer — user avatar + logout */}
@@ -215,6 +219,9 @@ export function Sidebar({ isAdmin = false, isMobileOpen = false, onMobileClose }
                             {/* Navigation */}
                             <nav className="flex-1 px-3 pt-4 pb-8 space-y-1 overflow-y-auto">
                                 <NavItems menuItems={menuItems} pathname={pathname} onItemClick={onMobileClose} />
+                                <div className="pt-2 mt-2 border-t border-zinc-800">
+                                   <AccessibilityPanel />
+                                </div>
                             </nav>
 
                             {/* Footer */}

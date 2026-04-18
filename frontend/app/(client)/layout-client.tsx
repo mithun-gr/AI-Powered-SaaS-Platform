@@ -4,7 +4,6 @@ import { useState, useEffect, ReactNode } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
 import { PageTransition } from "@/components/page-transition";
-import { AccessibilityPanel } from "@/components/accessibility-panel";
 import { GlobalLimitModal } from "@/components/global-limit-modal";
 import { CommandPalette } from "@/components/command-palette";
 import { useRouter, usePathname } from "next/navigation";
