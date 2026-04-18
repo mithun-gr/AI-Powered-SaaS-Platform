@@ -253,7 +253,7 @@ export default function RequestsPage() {
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <CardContent className="p-6 space-y-6">
+                <CardContent className="p-6 space-y-6 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar">
                   <div>
                     <h2 className="text-xl font-bold mb-2">{selectedRequest.title}</h2>
                     <div className="flex flex-wrap gap-2 items-center mb-4">
