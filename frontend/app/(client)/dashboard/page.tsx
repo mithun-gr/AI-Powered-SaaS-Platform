@@ -158,13 +158,15 @@ function UpgradeBanner() {
 function ReferralCard() {
   const [copied, setCopied] = useState(false);
   const [session, setSession] = useState<any>(null);
+  const [origin, setOrigin] = useState("https://ai-powered-saa-s-platform.vercel.app");
 
   useEffect(() => {
     setSession(getAuthSession());
+    setOrigin(window.location.origin);
   }, []);
 
   const code = `MRC-${(session?.email ?? "DEMO").split("@")[0].toUpperCase().slice(0, 6)}`;
-  const link = `https://morchantra.com/signup?ref=${code}`;
+  const link = `${origin}/signup?ref=${code}`;
 
   const copy = async () => {
     await navigator.clipboard.writeText(link);
