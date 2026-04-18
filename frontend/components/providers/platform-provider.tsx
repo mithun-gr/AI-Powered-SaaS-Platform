@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { loadPlatformConfig, type PlatformConfig } from "@/lib/platform-config";
+import { loadPlatformConfig, DEFAULT_CONFIG, type PlatformConfig } from "@/lib/platform-config";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, Megaphone, Terminal, ShieldAlert } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
@@ -14,13 +14,17 @@ interface PlatformContextType {
 const PlatformContext = createContext<PlatformContextType | undefined>(undefined);
 
 export function PlatformProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<PlatformConfig>(loadPlatformConfig());
+  const [config, setConfig] = useState<PlatformConfig>(DEFAULT_CONFIG);
   const router = useRouter();
   const pathname = usePathname();
 
   const refreshConfig = () => {
     setConfig(loadPlatformConfig());
   };
+
+  useEffect(() => {
+    refreshConfig(); // Hydrate safely after mount
+  }, []);
 
   useEffect(() => {
     // Listen for config changes from settings page

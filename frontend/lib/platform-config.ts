@@ -107,7 +107,7 @@ export const DEFAULT_CONFIG: PlatformConfig = {
     supportEmail: "support@morchantra.com",
     maxConcurrentRequests: 10,
   },
-  lastUpdatedAt: new Date().toISOString(),
+  lastUpdatedAt: "2026-01-01T00:00:00.000Z", // Static to prevent server/client hydration mismatch
   lastUpdatedBy: "system",
 };
 
