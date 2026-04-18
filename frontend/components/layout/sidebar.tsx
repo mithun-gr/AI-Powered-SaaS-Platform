@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -53,9 +54,17 @@ interface SidebarProps {
 
 // ── User footer shown at the bottom of the sidebar ──────────────────────────
 function SidebarUserFooter({ isAdmin }: { isAdmin: boolean }) {
-    const session = getAuthSession();
-    const name  = session?.name  ?? (isAdmin ? "Admin" : "Client");
-    const email = session?.email ?? "";
+    const [name, setName] = useState(isAdmin ? "Admin" : "Client");
+    const [email, setEmail] = useState("");
+
+    useEffect(() => {
+        const session = getAuthSession();
+        if (session) {
+            setName(session.name);
+            setEmail(session.email);
+        }
+    }, [isAdmin]);
+
     const initials = name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
 
     const handleLogout = () => {

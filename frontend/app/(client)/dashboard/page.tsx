@@ -157,7 +157,12 @@ function UpgradeBanner() {
 // ── Feature 11: Referral Card ─────────────────────────────────────────────────
 function ReferralCard() {
   const [copied, setCopied] = useState(false);
-  const session = getAuthSession();
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    setSession(getAuthSession());
+  }, []);
+
   const code = `MRC-${(session?.email ?? "DEMO").split("@")[0].toUpperCase().slice(0, 6)}`;
   const link = `https://morchantra.com/signup?ref=${code}`;
 
@@ -357,10 +362,16 @@ function RecentRequestsPanel() {
 }
 
 export default function DashboardPage() {
-  const session = getAuthSession();
-  const name = session?.name?.split(" ")[0] ?? "there";
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const [name, setName] = useState("there");
+  const [greeting, setGreeting] = useState("Good morning");
+
+  useEffect(() => {
+    const session = getAuthSession();
+    if (session?.name) setName(session.name.split(" ")[0]);
+    
+    const hour = new Date().getHours();
+    setGreeting(hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening");
+  }, []);
 
   // Linear-style "Display Options" state
   const [showDisplayMenu, setShowDisplayMenu] = useState(false);
