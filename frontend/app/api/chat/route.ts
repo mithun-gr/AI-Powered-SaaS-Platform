@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const SYSTEM_PROMPT = `You are "Later", the AI Business Concierge for Morchantra — a premium B2B enterprise services platform.
+const SYSTEM_PROMPT = `You are "Morchy", the AI Business Concierge for Morchantra — a premium B2B enterprise services platform.
 
 You help clients with these 8 core services:
 1. Legal Advisory (contracts, compliance, dispute resolution, NDA, IP)

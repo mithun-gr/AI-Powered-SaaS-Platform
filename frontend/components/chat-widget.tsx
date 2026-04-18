@@ -55,7 +55,7 @@ export function ChatWidget() {
     const [messages,  setMessages]  = useState<Message[]>([{
         id: "welcome-1",
         sender: "bot",
-        content: "👋 Hi there! I'm **Later**, your Morchantra AI concierge.\n\nI can help you track requests, check documents, answer service questions, or connect you with an expert. What can I do for you?",
+        content: "👋 Hi there! I'm **Morchy**, your Morchantra AI concierge.\n\nI can help you track requests, check documents, answer service questions, or connect you with an expert. What can I do for you?",
         timestamp: new Date(),
         suggestions: INITIAL_SUGGESTIONS,
     }]);
@@ -240,7 +240,7 @@ export function ChatWidget() {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-sm flex items-center gap-1.5">
-                                            Later <Sparkles className="h-3.5 w-3.5 text-primary" />
+                                            Morchy <Sparkles className="h-3.5 w-3.5 text-primary" />
                                         </h3>
                                         <p className="text-[10px] text-muted-foreground">
                                             {isStreaming ? "⚡ Streaming response…" : "✨ AI Concierge · Online"}
@@ -358,7 +358,7 @@ export function ChatWidget() {
                                     <Input
                                         value={input}
                                         onChange={e => setInput(e.target.value)}
-                                        placeholder={showEscalate ? "Enter your phone number…" : isStreaming ? "Later is responding…" : "Ask Later…"}
+                                        placeholder={showEscalate ? "Enter your phone number…" : isStreaming ? "Morchy is responding…" : "Ask Morchy…"}
                                         type={showEscalate ? "tel" : "text"}
                                         className="h-10 text-[13px] rounded-full px-4 pr-12 focus-visible:ring-1 focus-visible:ring-primary/50"
                                         disabled={isStreaming}

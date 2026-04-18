@@ -5,7 +5,7 @@ export interface ChatbotResponse {
   suggestions?: string[];
 }
 
-// System Persona: Business Concierge "Later"
+// System Persona: Business Concierge "Morchy"
 export class ChatbotService {
   private requests: Request[];
   private invoices: Invoice[];
@@ -105,7 +105,7 @@ export class ChatbotService {
     // 6. Chatbot Building
     if (lowerMessage.includes("chatbot") || lowerMessage.includes("ai") || lowerMessage.includes("automation")) {
       return {
-        message: "I can guide you through our Chatbot Building services, covering AI design, automation use cases, and system integration. We build smart assistants—just like me, Later!—to enhance customer engagement.\n\nWhat kind of automation are you envisioning?",
+        message: "I can guide you through our Chatbot Building services, covering AI design, automation use cases, and system integration. We build smart assistants—just like me, Morchy!—to enhance customer engagement.\n\nWhat kind of automation are you envisioning?",
         suggestions: ["AI Chatbot Design", "Automation Use Cases"]
       };
     }
@@ -130,7 +130,7 @@ export class ChatbotService {
     if (lowerMessage.includes("hello") || lowerMessage.includes("hi") || lowerMessage.includes("who are you") || lowerMessage.includes("later")) {
       const timeGreeting = isBusinessHours ? "it's a productive day!" : "it's currently after hours, but I'm here to help.";
       return {
-        message: `Hello! I'm Later, your AI-powered Business Concierge. ${timeGreeting}\n\nI can assist you with our 8 core services, including Legal, Insurance, Tech (MERN/Cloud), and Property Support. How can I assist you today?`,
+        message: `Hello! I'm Morchy, your AI-powered Business Concierge. ${timeGreeting}\n\nI can assist you with our 8 core services, including Legal, Insurance, Tech (MERN/Cloud), and Property Support. How can I assist you today?`,
         suggestions: ["Track Request", "Legal Advice", "Tech Services", "Property Support"]
       };
     }

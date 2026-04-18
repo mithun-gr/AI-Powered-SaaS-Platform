@@ -50,7 +50,7 @@ export default function SupportPage() {
     const [messages, setMessages] = useState<Message[]>([{
         id: "welcome",
         sender: "bot",
-        content: "👋 Hello! I'm Later, your Morchantra AI Business Concierge.\n\nI can help you with:\n• Tracking service requests & documents\n• Legal, Insurance, Cloud & Tech services\n• Scheduling expert consultations\n• Any platform queries\n\nHow can I assist you today?",
+        content: "👋 Hello! I'm Morchy, your Morchantra AI Business Concierge.\n\nI can help you with:\n• Tracking service requests & documents\n• Legal, Insurance, Cloud & Tech services\n• Scheduling expert consultations\n• Any platform queries\n\nHow can I assist you today?",
         timestamp: new Date(),
         suggestions: QUICK_PROMPTS.slice(0, 4).map(p => p.label),
     }]);
@@ -289,7 +289,7 @@ export default function SupportPage() {
                             </div>
                             <div>
                                 <CardTitle className="text-base font-bold flex items-center gap-1.5">
-                                    Later <Sparkles className="h-3.5 w-3.5 text-primary" />
+                                    Morchy <Sparkles className="h-3.5 w-3.5 text-primary" />
                                 </CardTitle>
                                 <p className="text-xs text-muted-foreground">
                                     {isStreaming
@@ -403,7 +403,7 @@ export default function SupportPage() {
                     <form onSubmit={e => { e.preventDefault(); handleSend(); }} className="flex gap-2">
                         <Input
                             ref={inputRef}
-                            placeholder={isStreaming ? "Later is responding…" : "Ask Later anything…"}
+                            placeholder={isStreaming ? "Morchy is responding…" : "Ask Morchy anything…"}
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             className="flex-1 h-10 text-sm focus-visible:ring-1"
