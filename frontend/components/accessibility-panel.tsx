@@ -20,27 +20,13 @@ import { cn } from "@/lib/utils";
 
 export function AccessibilityPanel() {
     const [isOpen, setIsOpen] = useState(false);
-    const [pos, setPos] = useState<{x: number | string, y: number | string}>({ x: 0, y: "50%" });
     const [isDragging, setIsDragging] = useState(false);
     const [mounted, setMounted] = useState(false);
     const dragButtonRef = useRef(null);
 
     useEffect(() => {
         setMounted(true);
-        const savedX = localStorage.getItem("mrc_display_tab_x");
-        const savedY = localStorage.getItem("mrc_display_tab_y");
-        if (savedX && savedY) {
-            setPos({ x: parseFloat(savedX), y: parseFloat(savedY) });
-        }
     }, []);
-
-    const handleDragEnd = (_: any, info: any) => {
-        const x = info.point.x;
-        const y = info.point.y;
-        localStorage.setItem("mrc_display_tab_x", x.toString());
-        localStorage.setItem("mrc_display_tab_y", y.toString());
-        setIsDragging(false);
-    };
     const {
         simpleFont, toggleSimpleFont,
         scaleLevel, setScaleLevel,
@@ -104,17 +90,18 @@ export function AccessibilityPanel() {
             {mounted && (
                 <motion.div
                     ref={dragButtonRef}
-                    drag
+                    drag="y"
+                    dragConstraints={{ top: -300, bottom: 300 }}
                     dragMomentum={false}
                     onDragStart={() => setIsDragging(true)}
-                    onDragEnd={handleDragEnd}
-                    style={{ left: pos.x, top: pos.y, position: 'fixed' }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9, cursor: "grabbing" }}
+                    onDragEnd={() => setIsDragging(false)}
+                    style={{ left: 0, top: "30vh", position: 'fixed' }}
+                    initial={{ scale: 0, opacity: 0, x: -50 }}
+                    animate={{ scale: 1, opacity: 1, x: 0 }}
+                    whileHover={{ scale: 1.05, x: 5 }}
+                    whileTap={{ scale: 0.95, cursor: "grabbing" }}
                     className={cn(
-                        "z-[60] flex flex-row items-center justify-center gap-2 py-2 px-4 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-colors hover:border-primary/50 group cursor-grab",
+                        "z-[60] flex flex-row items-center justify-center gap-2 py-3 px-4 pr-5 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 border-l-0 rounded-r-3xl shadow-[5px_0px_30px_rgba(0,0,0,0.5)] transition-colors hover:border-primary/50 group cursor-grab",
                         isOpen && "hidden"
                     )}
                 >
