@@ -83,15 +83,53 @@ function RequestChatThread({ requestId, expertName }: { requestId: string; exper
     try { localStorage.setItem(storageKey, JSON.stringify(messages)); } catch {}
   }, [messages, storageKey]);
 
-  const send = () => {
-    if (!input.trim()) return;
-    setMessages(m => [...m, { id: Date.now().toString(), sender: "user", text: input.trim(), time: "just now" }]);
+  const send = async () => {
+    if (!input.trim() || typing) return;
+    const userText = input.trim();
     setInput("");
+    setMessages(prev => [...prev, { id: Date.now().toString(), sender: "user", text: userText, time: "just now" }]);
     setTyping(true);
-    setTimeout(() => {
+
+    try {
+      const history = messages.map(m => ({
+        role: m.sender === "user" ? "user" : "assistant",
+        content: m.text
+      }));
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          message: userText, 
+          history,
+          expertContext: `You are answering regarding a client's support ticket (ID: ${requestId}). You are an expert assigned to this request. Your name is ${expertName || 'Morchantra Support'}. Address the client's query logically and helpfully.`
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed");
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) throw new Error("No reader");
+
+      const replyId = (Date.now() + 1).toString();
+      setMessages(prev => [...prev, { id: replyId, sender: "expert", text: "", time: "just now" }]);
       setTyping(false);
-      setMessages(m => [...m, { id: (Date.now() + 1).toString(), sender: "expert", text: "Got it! I'll look into that and update you shortly.", time: "just now" }]);
-    }, 1400);
+
+      let currentText = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        currentText += decoder.decode(value, { stream: true });
+        
+        setMessages(prev => 
+          prev.map(m => m.id === replyId ? { ...m, text: currentText } : m)
+        );
+      }
+    } catch(err) {
+      setTyping(false);
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), sender: "expert", text: "Got it! I am currently away from my desk, but I will look into this and update you shortly.", time: "just now" }]);
+    }
   };
 
   return (

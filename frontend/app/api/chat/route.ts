@@ -54,19 +54,25 @@ export async function POST(req: NextRequest) {
 
   let message: string;
   let history: ChatMessage[] = [];
+  let expertContext: string | undefined;
 
   try {
     const body = await req.json();
     message = body.message?.trim() ?? "";
     history = body.history ?? [];
+    expertContext = body.expertContext;
   } catch {
     return errorStream("Invalid request. Please try again.");
   }
 
   if (!message) return errorStream("Please send a message.");
 
+  const finalSystemPrompt = expertContext ? 
+    `You are a Morchantra professional expert handling a client request. ${expertContext} Keep responses concise, professional, and directly address the user's issue.` : 
+    SYSTEM_PROMPT;
+
   const messages: ChatMessage[] = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: finalSystemPrompt },
     ...history.slice(-10),           // last 10 turns for context
     { role: "user", content: message },
   ];
