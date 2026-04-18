@@ -76,7 +76,6 @@ export default function DashboardLayoutClient({ children }: { children: ReactNod
           </div>
         </main>
       </div>
-      <AccessibilityPanel />
       <GlobalLimitModal />
       <CommandPalette />
     </div>
