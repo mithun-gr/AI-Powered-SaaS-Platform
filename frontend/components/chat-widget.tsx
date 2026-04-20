@@ -113,16 +113,15 @@ export function ChatWidget() {
         let isAntigravityMode = false;
         let finalActionMessage = "";
 
-        const triggerAntigravitySequence = (actionType: string, actionDetails: string) => {
+        const triggerAntigravitySequence = (actionType: string, actionDetails: string, domCallback?: () => void) => {
             isAntigravityMode = true;
             setIsStreaming(true);
 
-            // Antigravity Step-by-Step Visualization
             const steps = [
-                `[SYSTEM] Antigravity Protocol Initiated...`,
-                `[AGENT] Accessing DOM layout and user context...`,
-                `[AGENT] Synthesizing parameters for: ${actionType}`,
-                `[TOOL_CALL: Execute_Mutation] Injecting data into state...`,
+                `[SYSTEM] Antigravity Root Protocol Initiated...`,
+                `[AGENT] Accessing Global DOM layout...`,
+                `[AGENT] Synthesizing target parameters for: ${actionType}`,
+                `[TOOL_CALL: executeJavascript] Hijacking component execution...`,
                 `✅ [SUCCESS] ${actionDetails}`
             ];
 
@@ -136,12 +135,15 @@ export function ChatWidget() {
                         if (idx === steps.length - 1) {
                             next[next.length - 1].isTyping = false;
                             setIsStreaming(false);
-                            // Trigger the actual system mutations at the end
+                            
+                            // Physical Web Execution
+                            if (domCallback) domCallback();
+
+                            // State Fallbacks
                             if (actionType === "TICKET_CREATION") {
                                 const stored = JSON.parse(localStorage.getItem("mrc_requests_mock_db") ?? "[]");
                                 const newReq = {
-                                    id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
-                                    clientId: "USR-001", title: "Autonomous Agent Task", description: text,
+                                    id: `REQ-${Math.floor(100 + Math.random() * 900)}`, clientId: "USR-001", title: "Agentic Task", description: text,
                                     service: "Antigravity Ops", status: "in_progress", priority: "high",
                                     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
                                 };
@@ -153,24 +155,46 @@ export function ChatWidget() {
                         }
                         return next;
                     });
-                }, (idx + 1) * 800); // 800ms per step simulating thought process
+                }, (idx + 1) * 850); 
             });
         };
 
-        // Parse Intents for Antigravity Agent
-        if (lowerText.includes("create") && (lowerText.includes("ticket") || lowerText.includes("request"))) {
+        // ==========================================
+        // 🌐 GLOBAL DOM CONTROL INTENTS
+        // ==========================================
+        if (lowerText.includes("scan") && (lowerText.includes("receipt") || lowerText.includes("invoice"))) {
+             triggerAntigravitySequence("OCR_EXTRACTION", "Physical DOM Override: Automatically triggering Morchantra OCR Vision module.", () => {
+                 // Physically act like Antigravity clicking the screen
+                 const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes("Upload Receipt Image"));
+                 if (btn) btn.click();
+             });
+        }
+        else if (lowerText.includes("face id") || lowerText.includes("biometric") || lowerText.includes("verify me")) {
+             triggerAntigravitySequence("BIOMETRIC_AUTH", "Physical DOM Override: Hijacking Webcam API for direct authorization.", () => {
+                 const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes("Face ID"));
+                 if (btn) btn.click();
+             });
+        }
+        else if (lowerText.includes("contract") && lowerText.includes("generate")) {
+             triggerAntigravitySequence("AUTONOMOUS_DOCS", "Physical DOM Override: Initiating Groq Multi-Phase Legal Workflow.", () => {
+                 const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes("Author Legal Document via AI"));
+                 if (btn) btn.click();
+             });
+        }
+        // ==========================================
+        // FALLBACK INTENTS (Tickets & Routing)
+        // ==========================================
+        else if (lowerText.includes("create") && (lowerText.includes("ticket") || lowerText.includes("request"))) {
             triggerAntigravitySequence("TICKET_CREATION", "Ticket generated autonomously. UI state refreshed.");
         } else if (lowerText.includes("navigate") || lowerText.includes("open") || lowerText.includes("go to")) {
             if (lowerText.includes("dashboard") || lowerText.includes("overview")) triggerAntigravitySequence("ROUTING", "Navigated to Dashboard successfully.");
             else if (lowerText.includes("document") || lowerText.includes("vault")) triggerAntigravitySequence("ROUTING", "Navigated to Document Vault successfully.");
             else if (lowerText.includes("payment") || lowerText.includes("billing")) triggerAntigravitySequence("ROUTING", "Navigated to Payments successfully.");
         } else if (lowerText.includes("antigravity") || lowerText.includes("automate")) {
-             triggerAntigravitySequence("DEEP_AUTOMATION", "Complete website orchestration hook attached. Ready for complex parameters.");
+             triggerAntigravitySequence("DEEP_AUTOMATION", "Global Website Orchestration root access granted. Awaiting physical DOM commands.");
         }
 
-        if (isAntigravityMode) {
-            return; // Skip normal LLM processing since Antigravity is running
-        }
+        if (isAntigravityMode) return;
         // ==========================================
 
         // Escalate phone-capture mode
