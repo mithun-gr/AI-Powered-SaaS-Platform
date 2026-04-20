@@ -67,7 +67,7 @@ export function AdvancedE2EDemo() {
   };
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 text-white max-w-3xl mx-auto my-8">
+    <div className="w-full bg-zinc-900/50 border border-zinc-800/60 rounded-2xl p-6 text-white">
       <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent mb-6 flex items-center gap-2">
         <Brain className="w-6 h-6 text-primary" /> Advanced E2E Innovation Lab
       </h2>
