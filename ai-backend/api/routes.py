@@ -80,3 +80,88 @@ async def ingest_knowledge(request: IngestRequest):
 @api_router.post("/support-ticket", tags=["Escalation"])
 async def create_support_ticket(ticket: SupportTicket):
     return {"status": "Ticket escalated to human queue", "userId": ticket.userId}
+
+# ==============================================================
+# ADVANCED PRESENTATION FEATURES (THE "END TO END" SUITE)
+# ==============================================================
+
+class BiometricRequest(BaseModel):
+    userId: str
+    image_b64: str
+
+@api_router.post("/verify-biometric", tags=["Advanced E2E"])
+async def verify_biometric(data: BiometricRequest):
+    """
+    Simulates Facial Recognition / Zero-Trust Security checking. 
+    In production, this routes the Base64 image to DeepFace or OpenCV.
+    """
+    import asyncio
+    await asyncio.sleep(1.8) # Simulate heavy neural network processing
+    return {"verified": True, "confidence": 0.985, "message": "Biometric match successful"}
+
+class DocumentGenRequest(BaseModel):
+    document_type: str # e.g., "NDA", "Invoice"
+    context: str
+
+@api_router.post("/generate-document", tags=["Advanced E2E"])
+async def generate_document(data: DocumentGenRequest):
+    """
+    Autonomous Generative AI. 
+    Takes a tiny amount of context and authors a massive, legally structured document via Groq.
+    """
+    from groq import Groq
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    
+    prompt = f"Write a formal {data.document_type} contract based ONLY on this context: {data.context}. Make it multiple paragraphs, highly professional, with placeholders for signatures."
+    
+    completion = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "system", "content": "You are a professional corporate lawyer."}, {"role": "user", "content": prompt}],
+        temperature=0.1
+    )
+    return {"document_content": completion.choices[0].message.content, "type": data.document_type}
+
+class SentimentRequest(BaseModel):
+    text: str
+
+@api_router.post("/analyze-sentiment", tags=["Advanced E2E"])
+async def analyze_sentiment(data: SentimentRequest):
+    """
+    Real-Time Stress Detection. 
+    Intercepts client messages to determine if they need urgent human escalation.
+    """
+    from groq import Groq
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    
+    prompt = f"Analyze the sentiment of this text: '{data.text}'. Return ONLY 'FRUSTRATED', 'NEUTRAL', or 'HAPPY'. Nothing else."
+    
+    completion = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=10
+    )
+    
+    sentiment = completion.choices[0].message.content.strip().upper()
+    needs_escalation = "FRUSTRATED" in sentiment
+    
+    return {"sentiment": sentiment, "needs_escalation": needs_escalation}
+
+@api_router.post("/ocr-invoice", tags=["Advanced E2E"])
+async def ocr_invoice(data: BiometricRequest):
+    """
+    Computer Vision Text Extraction.
+    In production, this routes an image to Tesseract/Google Vision. 
+    Returns strictly structured JSON from chaotic messy images.
+    """
+    import asyncio
+    await asyncio.sleep(2.0)
+    # Simulated extraction for testing presentation pipeline
+    return {
+        "extracted_data": {
+            "vendor": "Amazon Web Services",
+            "total_amount": 1450.00,
+            "date": "2026-04-18",
+            "category": "Cloud Infrastructure"
+        },
+        "success": True
+    }

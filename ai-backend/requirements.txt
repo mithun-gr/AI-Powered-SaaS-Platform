@@ -11,3 +11,6 @@ pydantic
 python-dotenv
 supabase
 aiosqlite
+reportlab
+vaderSentiment
+python-multipart

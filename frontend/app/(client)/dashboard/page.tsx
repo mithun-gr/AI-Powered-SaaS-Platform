@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { dashboardMetrics, recentRequests, pricingTiers } from "@/lib/dummy-data";
 import { fadeIn, staggerContainer } from "@/lib/animations";
+import { AdvancedE2EDemo } from "@/components/e2e-demo-module";
+import { UserRole } from "@/lib/auth-session";
 import { getAuthSession } from "@/lib/auth-session";
 import { NotificationBell } from "@/components/client/NotificationBell";
 import { useSearch } from "@/lib/use-search";
@@ -582,6 +584,11 @@ export default function DashboardPage() {
           <ComplianceReminders />
           <ReferralCard />
         </div>
+      </div>
+
+      {/* Advanced E2E Innovation Lab */}
+      <div className="mt-6">
+        <AdvancedE2EDemo />
       </div>
 
       {/* Feature 10: Activity Feed */}
