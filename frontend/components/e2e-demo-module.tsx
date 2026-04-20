@@ -229,14 +229,21 @@ export function AdvancedE2EDemo() {
                  </div>
               )}
               {ocrStatus === "extracted" && receiptData && (
-                 <div className="text-left bg-black p-4 rounded-lg border border-zinc-800 font-mono text-xs space-y-2">
-                    <div className="flex justify-between items-center border-b border-zinc-800 pb-2 mb-2">
-                       <span className="text-emerald-400 font-bold">DATA EXTRACTED SUCCESSFULLY</span>
-                       <span className="text-zinc-600">CONFIDENCE: {receiptData.confidence}</span>
-                    </div>
-                    <p><span className="text-zinc-500">VENDOR:</span> {receiptData.vendor}</p>
-                    <p><span className="text-zinc-500">DATE:</span> {receiptData.date}</p>
-                    <p className="text-xl text-white mt-4"><span className="text-zinc-500 text-xs">TOTAL:</span> {receiptData.amount}</p>
+                 <div className="space-y-4">
+                     <div className="text-left bg-black p-4 rounded-lg border border-zinc-800 font-mono text-xs space-y-2">
+                        <div className="flex justify-between items-center border-b border-zinc-800 pb-2 mb-2">
+                           <span className={receiptData.vendor === "Unreadable Format" ? "text-red-400 font-bold" : "text-emerald-400 font-bold"}>
+                               {receiptData.vendor === "Unreadable Format" ? "EXTRACTION FAILED" : "DATA EXTRACTED SUCCESSFULLY"}
+                           </span>
+                           <span className="text-zinc-600">CONFIDENCE: {receiptData.confidence}</span>
+                        </div>
+                        <p><span className="text-zinc-500">VENDOR:</span> {receiptData.vendor}</p>
+                        <p><span className="text-zinc-500">DATE:</span> {receiptData.date}</p>
+                        <p className="text-xl text-white mt-4"><span className="text-zinc-500 text-xs">TOTAL:</span> {receiptData.amount}</p>
+                     </div>
+                     <button onClick={() => { setOcrStatus("idle"); setReceiptData(null); }} className="text-[10px] text-zinc-500 hover:text-white flex items-center justify-center w-full gap-1 transition-colors border border-zinc-700 px-3 py-2 rounded-lg hover:bg-zinc-800">
+                         <RefreshCw className="w-3 h-3" /> Scan Another Document
+                     </button>
                  </div>
               )}
            </div>
