@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Camera, FileText, BrainCrash, FileSearch, ShieldCheck, Loader2 } from "lucide-react";
+import { Camera, FileText, Brain, FileSearch, ShieldCheck, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // This is an advanced prototyping panel allowing the presentation of the 4 E2E AI Features
@@ -69,7 +69,7 @@ export function AdvancedE2EDemo() {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 text-white max-w-3xl mx-auto my-8">
       <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent mb-6 flex items-center gap-2">
-        <BrainCrash className="w-6 h-6 text-primary" /> Advanced E2E Innovation Lab
+        <Brain className="w-6 h-6 text-primary" /> Advanced E2E Innovation Lab
       </h2>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -77,7 +77,7 @@ export function AdvancedE2EDemo() {
           { icon: Camera, title: "Zero-Trust Biometrics" },
           { icon: FileSearch, title: "Invoice OCR" },
           { icon: FileText, title: "Autonomous Contracts" },
-          { icon: BrainCrash, title: "Sentiment Trigger" }
+          { icon: Brain, title: "Sentiment Trigger" }
         ].map((item, idx) => (
           <button 
             key={idx}
