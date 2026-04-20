@@ -41,14 +41,28 @@ export async function POST(req: NextRequest) {
       });
 
       const visionData = await visionResponse.json();
-      let extractedJSON;
+      const rawText = visionData.choices?.[0]?.message?.content || "";
+      
+      let extractedJSON = { vendor: "N/A", date: "N/A", amount: "N/A", confidence: "Low" };
+      
       try {
-          const rawText = visionData.choices[0].message.content;
-          // Clean up potential markdown formatting around JSON
-          const cleanedText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
-          extractedJSON = JSON.parse(cleanedText);
+          // Robust JSON extraction using regex to grab text between the first and last curly braces
+          const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+              const parsed = JSON.parse(jsonMatch[0].trim());
+              // Standardize keys (force lowercase comparison to handle LLM variations)
+              const standardized: any = {};
+              Object.keys(parsed).forEach(k => standardized[k.toLowerCase()] = parsed[k]);
+              
+              extractedJSON = {
+                  vendor: standardized.vendor || standardized.merchant || "Unknown",
+                  date: standardized.date || standardized.time || "N/A",
+                  amount: standardized.amount || standardized.total || "N/A",
+                  confidence: standardized.confidence || "High"
+              };
+          }
       } catch (e) {
-          extractedJSON = { vendor: "Unreadable Format", date: "N/A", amount: "N/A", confidence: "Low" };
+          console.error("OCR Parse Error:", e);
       }
 
       return NextResponse.json(extractedJSON);
