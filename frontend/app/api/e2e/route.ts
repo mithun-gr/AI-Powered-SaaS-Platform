@@ -18,14 +18,40 @@ export async function POST(req: NextRequest) {
 
     // 2. OCR INVOICE EXTRACTION (LLM acting as Vision Parser)
     if (action === "ocr-invoice") {
-      await new Promise(r => setTimeout(r, 1200)); 
-      // For presentation: simulating OCR buffer extraction
-      return NextResponse.json({
-        vendor: "Vercel / AWS",
-        date: new Date().toISOString().split("T")[0],
-        amount: "$3,450.00",
-        confidence: "98.7%"
+      if (!payload?.image) {
+          return NextResponse.json({ error: "No image provided" }, { status: 400 });
+      }
+
+      const visionResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({
+          model: "llama-3.2-11b-vision-preview",
+          messages: [
+            { 
+               role: "user", 
+               content: [
+                 { type: "text", text: "You are an advanced OCR engine. Analyze this receipt or invoice and extract the following details precisely as strict JSON and nothing else: { \"vendor\": \"string\", \"date\": \"string\", \"amount\": \"string\", \"confidence\": \"string\" }. If missing, guess or write N/A." },
+                 { type: "image_url", image_url: { url: payload.image } }
+               ] 
+            }
+          ],
+          temperature: 0.1, max_tokens: 150
+        }),
       });
+
+      const visionData = await visionResponse.json();
+      let extractedJSON;
+      try {
+          const rawText = visionData.choices[0].message.content;
+          // Clean up potential markdown formatting around JSON
+          const cleanedText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+          extractedJSON = JSON.parse(cleanedText);
+      } catch (e) {
+          extractedJSON = { vendor: "Unreadable Format", date: "N/A", amount: "N/A", confidence: "Low" };
+      }
+
+      return NextResponse.json(extractedJSON);
     }
 
     // 3. SENTIMENT ANALYSIS (True ML Execution via Groq)

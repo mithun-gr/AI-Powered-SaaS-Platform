@@ -80,14 +80,29 @@ export function AdvancedE2EDemo() {
   const [chatInput, setChatInput] = useState("");
   const [chatResponse, setChatResponse] = useState<string | null>(null);
 
-  const simulateOCR = async () => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
     setOcrStatus("uploading");
-    try {
-       const res = await fetch("/api/e2e", { method: "POST", body: JSON.stringify({ action: "ocr-invoice" }) });
-       const data = await res.json();
-       setOcrStatus("extracted");
-       setReceiptData(data);
-    } catch { setOcrStatus("idle"); }
+    
+    // Convert to base64 Data URL
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const base64Image = e.target?.result as string;
+        try {
+           const res = await fetch("/api/e2e", { 
+               method: "POST", 
+               body: JSON.stringify({ action: "ocr-invoice", payload: { image: base64Image } }) 
+           });
+           const data = await res.json();
+           setReceiptData(data);
+           setOcrStatus("extracted");
+        } catch { 
+           setOcrStatus("idle"); 
+        }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleGenerateDoc = async () => {
@@ -201,10 +216,11 @@ export function AdvancedE2EDemo() {
         <div className="p-4 bg-black/50 border border-zinc-800 rounded-lg space-y-4">
            <div className="border border-dashed border-zinc-700 bg-zinc-900 rounded-xl p-8 text-center">
               {ocrStatus === "idle" && (
-                 <button onClick={simulateOCR} className="text-xs text-zinc-400 font-bold hover:text-white flex flex-col items-center gap-2 mx-auto">
+                 <label className="text-xs text-zinc-400 font-bold hover:text-white flex flex-col items-center gap-2 mx-auto cursor-pointer">
                     <FileSearch className="w-6 h-6 border p-1 rounded border-zinc-700" />
-                    Upload Receipt (.jpg)
-                 </button>
+                    Upload Receipt Image (.jpg/.png)
+                    <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+                 </label>
               )}
               {ocrStatus === "uploading" && (
                  <div className="flex flex-col items-center text-primary gap-2">
