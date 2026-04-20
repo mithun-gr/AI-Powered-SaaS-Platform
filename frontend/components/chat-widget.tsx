@@ -72,41 +72,8 @@ export function ChatWidget() {
 
     useEffect(() => { chatbotService.current.setPersona(config.ai.persona); }, [config.ai.persona]);
     useEffect(() => { if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, isOpen]);
-
-    if (pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/admin")) return null;
-    if (!isVisible) return null;
-
-    // ── Copy helper ──────────────────────────────────────────────────────────
-    const handleCopy = (id: string, text: string) => {
-        navigator.clipboard.writeText(text);
-        setCopiedId(id);
-        setTimeout(() => setCopiedId(null), 2000);
-    };
-
-    // ── Clear chat ───────────────────────────────────────────────────────────
-    const handleClearChat = () => {
-        abortRef.current?.abort();
-        setConversationHistory([]);
-        setShowEscalate(false);
-        setMessages([{
-            id: `welcome-${Date.now()}`,
-            sender: "bot",
-            content: "✨ Chat cleared! Fresh start — what can I help you with?",
-            timestamp: new Date(),
-            suggestions: INITIAL_SUGGESTIONS,
-        }]);
-    };
-
-    // ── Escalate shortcut ────────────────────────────────────────────────────
-    const triggerEscalate = () => {
-        setShowEscalate(true);
-        setMessages(prev => [...prev, {
-            id: `esc-${Date.now()}`,
-            sender: "bot",
-            content: "📞 No problem! Please type your **phone number** below and a senior expert will call you within 15–30 minutes.",
-            timestamp: new Date(),
-        }]);
-    };
+    useEffect(() => { chatbotService.current.setPersona(config.ai.persona); }, [config.ai.persona]);
+    useEffect(() => { if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, isOpen]);
 
     // ── Main send — REAL STREAMING ───────────────────────────────────────────
     const handleSend = useCallback(async (messageText?: string) => {
@@ -138,6 +105,8 @@ export function ChatWidget() {
             const done: string[] = JSON.parse(localStorage.getItem("mrc_onboard_done") ?? "[]");
             if (!done.includes("ai")) localStorage.setItem("mrc_onboard_done", JSON.stringify([...done, "ai"]));
         } catch {}
+
+
 
         // Escalate phone-capture mode
         if (showEscalate) {
@@ -200,7 +169,6 @@ export function ChatWidget() {
         } catch (err: unknown) {
             if (err instanceof Error && err.name === "AbortError") return;
 
-            // Local fallback
             const fb = chatbotService.current.processMessage(text);
             setMessages(prev => prev.map(m =>
                 m.id === botId
@@ -217,7 +185,41 @@ export function ChatWidget() {
         }
     }, [input, isStreaming, conversationHistory, showEscalate]);
 
-    // ── Render ───────────────────────────────────────────────────────────────
+    // ── Copy helper ──────────────────────────────────────────────────────────
+    const handleCopy = (id: string, text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    // ── Clear chat ───────────────────────────────────────────────────────────
+    const handleClearChat = () => {
+        abortRef.current?.abort();
+        setConversationHistory([]);
+        setShowEscalate(false);
+        setMessages([{
+            id: `welcome-${Date.now()}`,
+            sender: "bot",
+            content: "✨ Chat cleared! Fresh start — what can I help you with?",
+            timestamp: new Date(),
+            suggestions: INITIAL_SUGGESTIONS,
+        }]);
+    };
+
+    // ── Escalate shortcut ────────────────────────────────────────────────────
+    const triggerEscalate = () => {
+        setShowEscalate(true);
+        setMessages(prev => [...prev, {
+            id: `esc-${Date.now()}`,
+            sender: "bot",
+            content: "📞 No problem! Please type your **phone number** below and a senior expert will call you within 15–30 minutes.",
+            timestamp: new Date(),
+        }]);
+    };
+
+    if (pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/admin")) return null;
+    if (!isVisible) return null;
+
     return (
         <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end group/widget">
             <AnimatePresence>
