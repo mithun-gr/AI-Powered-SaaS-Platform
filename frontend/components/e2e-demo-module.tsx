@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Camera, FileText, Brain, FileSearch, ShieldCheck, Loader2 } from "lucide-react";
+import { Camera, FileText, Brain, FileSearch, ShieldCheck, Loader2, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // This is an advanced prototyping panel allowing the presentation of the 4 E2E AI Features
