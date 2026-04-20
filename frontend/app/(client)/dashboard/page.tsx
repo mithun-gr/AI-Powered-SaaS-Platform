@@ -548,6 +548,7 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         {displayPrefs.quickActions && (
           <motion.div 
+            key="quick-actions"
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
@@ -594,7 +595,8 @@ export default function DashboardPage() {
       {/* Feature 10: Activity Feed */}
       <AnimatePresence mode="popLayout">
         {displayPrefs.activityFeed && (
-          <motion.div 
+          <motion.div
+            key="activity-feed"
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
