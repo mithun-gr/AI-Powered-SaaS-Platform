@@ -509,6 +509,7 @@ export default function DashboardPage() {
         {/* Metrics */}
         {displayPrefs.metrics && (
           <motion.div 
+            key="metrics"
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
