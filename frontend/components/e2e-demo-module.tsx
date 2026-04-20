@@ -184,8 +184,15 @@ export function AdvancedE2EDemo() {
                  </button>
              </div>
            )}
-           {bioStatus === "verified" && <p className="text-xs text-emerald-400 font-bold mt-4">IDENTITY CONFIRMED. TRANSACTION CLEARED.</p>}
-           {bioStatus === "error" && <p className="text-xs text-red-500 font-bold mt-4">AUTHENTICATION FAILED OR CANCELLED.</p>}
+           {bioStatus === "verified" && (
+             <div className="flex flex-col items-center justify-center gap-3 mt-4">
+                 <p className="text-xs text-emerald-400 font-bold uppercase tracking-wider">Identity Confirmed. Transaction Cleared.</p>
+                 <button onClick={() => setBioStatus("idle")} className="text-[10px] text-zinc-500 hover:text-white flex items-center gap-1 transition-colors border border-zinc-700 px-3 py-1 rounded-full hover:bg-zinc-800">
+                     <RefreshCw className="w-3 h-3" /> Reset Security Protocol
+                 </button>
+             </div>
+           )}
+           {bioStatus === "error" && <p className="text-xs text-red-500 font-bold mt-4 uppercase tracking-wider">Authentication Failed or Cancelled. Retrying...</p>}
         </div>
       )}
 
