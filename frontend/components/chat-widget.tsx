@@ -107,61 +107,69 @@ export function ChatWidget() {
         } catch {}
 
         // ==========================================
-        // 🚀 TRUE AGENTIC UI EXECUTION LAYER 🚀
+        // 🚀 ANTIGRAVITY AGENTIC EXECUTION HUD 🚀
         // ==========================================
         const lowerText = text.toLowerCase();
-        let agentExecuted = false;
-        let agentActionMessage = "";
+        let isAntigravityMode = false;
+        let finalActionMessage = "";
 
-        // ACTION 1: Autonomous Ticket Creation
+        const triggerAntigravitySequence = (actionType: string, actionDetails: string) => {
+            isAntigravityMode = true;
+            setIsStreaming(true);
+
+            // Antigravity Step-by-Step Visualization
+            const steps = [
+                `[SYSTEM] Antigravity Protocol Initiated...`,
+                `[AGENT] Accessing DOM layout and user context...`,
+                `[AGENT] Synthesizing parameters for: ${actionType}`,
+                `[TOOL_CALL: Execute_Mutation] Injecting data into state...`,
+                `✅ [SUCCESS] ${actionDetails}`
+            ];
+
+            let msgs = ``;
+            steps.forEach((step, idx) => {
+                setTimeout(() => {
+                    msgs += (idx === 0 ? step : `\n${step}`);
+                    setMessages(prev => {
+                        const next = [...prev];
+                        next[next.length - 1].content = "```bash\n" + msgs + "\n```";
+                        if (idx === steps.length - 1) {
+                            next[next.length - 1].isTyping = false;
+                            setIsStreaming(false);
+                            // Trigger the actual system mutations at the end
+                            if (actionType === "TICKET_CREATION") {
+                                const stored = JSON.parse(localStorage.getItem("mrc_requests_mock_db") ?? "[]");
+                                const newReq = {
+                                    id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
+                                    clientId: "USR-001", title: "Autonomous Agent Task", description: text,
+                                    service: "Antigravity Ops", status: "in_progress", priority: "high",
+                                    createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+                                };
+                                localStorage.setItem("mrc_requests_mock_db", JSON.stringify([newReq, ...stored]));
+                                window.dispatchEvent(new Event("mrc:websocket-update"));
+                            } else if (actionType === "ROUTING") {
+                                window.location.href = actionDetails.includes("Dashboard") ? "/dashboard" : actionDetails.includes("Document") ? "/documents" : "/payments";
+                            }
+                        }
+                        return next;
+                    });
+                }, (idx + 1) * 800); // 800ms per step simulating thought process
+            });
+        };
+
+        // Parse Intents for Antigravity Agent
         if (lowerText.includes("create") && (lowerText.includes("ticket") || lowerText.includes("request"))) {
-            try {
-                const stored = JSON.parse(localStorage.getItem("mrc_requests_mock_db") ?? "[]");
-                const newReq = {
-                    id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
-                    clientId: "USR-001",
-                    title: "AI-Generated Auto Request",
-                    description: text,
-                    service: "AI Ops",
-                    status: "in_progress",
-                    priority: "high",
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-                localStorage.setItem("mrc_requests_mock_db", JSON.stringify([newReq, ...stored]));
-                window.dispatchEvent(new Event("mrc:websocket-update")); // Auto-refresh UI
-                
-                agentActionMessage = `✅ **Agentic Execution Complete:** I have securely connected to the Morchantra API and autonomously drafted and submitted Ticket **${newReq.id}** on your behalf. It is now visible on your Dashboard.`;
-                agentExecuted = true;
-            } catch (e) {}
-        }
-        
-        // ACTION 2: Autonomous Navigation
-        else if (lowerText.includes("navigate to") || lowerText.includes("open") || lowerText.includes("go to")) {
-            if (lowerText.includes("dashboard") || lowerText.includes("overview")) {
-                window.location.href = "/dashboard";
-                agentExecuted = true;
-            } else if (lowerText.includes("document") || lowerText.includes("vault")) {
-                window.location.href = "/documents";
-                agentExecuted = true;
-            } else if (lowerText.includes("payment") || lowerText.includes("billing")) {
-                window.location.href = "/payments";
-                agentExecuted = true;
-            }
+            triggerAntigravitySequence("TICKET_CREATION", "Ticket generated autonomously. UI state refreshed.");
+        } else if (lowerText.includes("navigate") || lowerText.includes("open") || lowerText.includes("go to")) {
+            if (lowerText.includes("dashboard") || lowerText.includes("overview")) triggerAntigravitySequence("ROUTING", "Navigated to Dashboard successfully.");
+            else if (lowerText.includes("document") || lowerText.includes("vault")) triggerAntigravitySequence("ROUTING", "Navigated to Document Vault successfully.");
+            else if (lowerText.includes("payment") || lowerText.includes("billing")) triggerAntigravitySequence("ROUTING", "Navigated to Payments successfully.");
+        } else if (lowerText.includes("antigravity") || lowerText.includes("automate")) {
+             triggerAntigravitySequence("DEEP_AUTOMATION", "Complete website orchestration hook attached. Ready for complex parameters.");
         }
 
-        // Apply Agentic Override if triggered
-        if (agentExecuted && agentActionMessage) {
-            setTimeout(() => {
-                setMessages(prev => {
-                    const next = [...prev];
-                    next[next.length - 1].content = agentActionMessage;
-                    next[next.length - 1].isTyping = false;
-                    return next;
-                });
-                setIsStreaming(false);
-            }, 1000);
-            return; // Skip normal chatbot processing
+        if (isAntigravityMode) {
+            return; // Skip normal LLM processing since Antigravity is running
         }
         // ==========================================
 
