@@ -9,8 +9,64 @@ export function AdvancedE2EDemo() {
   const [activeTab, setActiveTab] = useState<number | null>(null);
   
   // 1. Biometric Lock State
-  const [bioStatus, setBioStatus] = useState<"idle" | "scanning" | "verified">("idle");
-  
+  const [bioStatus, setBioStatus] = useState<"idle" | "scanning-face" | "scanning-fingerprint" | "verified" | "error">("idle");
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const startFaceScan = async () => {
+    setBioStatus("scanning-face");
+    try {
+       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+       if (videoRef.current) {
+           videoRef.current.srcObject = stream;
+           videoRef.current.play();
+       }
+       // Let it run for 2.5 seconds to prove the webcam works
+       setTimeout(async () => {
+           // Stop the camera
+           stream.getTracks().forEach(track => track.stop());
+           
+           // Verify against backend
+           await fetch("/api/e2e", { method: "POST", body: JSON.stringify({ action: "verify-biometric" }) });
+           setBioStatus("verified");
+       }, 2500);
+    } catch (err) { 
+       setBioStatus("error"); 
+       setTimeout(() => setBioStatus("idle"), 3000);
+    }
+  };
+
+  const startHardwareAuth = async (attachmentType: "platform" | "cross-platform") => {
+    setBioStatus("scanning-fingerprint");
+    try {
+        // Trigger native OS physical hardware authentication (Touch ID, Windows Hello, YubiKey)
+        const challenge = new Uint8Array(32);
+        crypto.getRandomValues(challenge);
+        const userId = new Uint8Array(16);
+        crypto.getRandomValues(userId);
+
+        await navigator.credentials.create({ 
+            publicKey: {
+                challenge,
+                rp: { name: "Morchantra Zero-Trust", id: window.location.hostname },
+                user: { id: userId, name: "demo@morchantra.com", displayName: "Demo User" },
+                pubKeyCredParams: [{type: "public-key", alg: -7}],
+                authenticatorSelection: {
+                    authenticatorAttachment: attachmentType, // "platform" = Mac TouchID, "cross-platform" = Bluetooth Key
+                    userVerification: "required"
+                },
+                timeout: 60000,
+            } 
+        });
+        
+        await fetch("/api/e2e", { method: "POST", body: JSON.stringify({ action: "verify-biometric" }) });
+        setBioStatus("verified");
+    } catch (err) {
+        // User cancelled the OS prompt or device missing
+        setBioStatus("error");
+        setTimeout(() => setBioStatus("idle"), 2000);
+    }
+  };
+
   // 2. OCR State
   const [ocrStatus, setOcrStatus] = useState<"idle" | "uploading" | "extracted">("idle");
   const [receiptData, setReceiptData] = useState<any>(null);
@@ -23,14 +79,6 @@ export function AdvancedE2EDemo() {
   // 4. Sentiment State
   const [chatInput, setChatInput] = useState("");
   const [chatResponse, setChatResponse] = useState<string | null>(null);
-
-  const simulateBiometric = async () => {
-    setBioStatus("scanning");
-    try {
-       await fetch("/api/e2e", { method: "POST", body: JSON.stringify({ action: "verify-biometric" }) });
-       setBioStatus("verified");
-    } catch { setBioStatus("idle"); }
-  };
 
   const simulateOCR = async () => {
     setOcrStatus("uploading");
@@ -98,15 +146,26 @@ export function AdvancedE2EDemo() {
         <div className="p-4 bg-black/50 border border-zinc-800 rounded-lg text-center space-y-4">
            <h3 className="text-sm text-zinc-400 border-b border-zinc-800 pb-2 mb-4">Transferring $5,000 USD to Escrow...</h3>
            <div className="h-32 w-32 bg-zinc-900 border-2 border-dashed border-zinc-700 rounded-full mx-auto flex items-center justify-center relative overflow-hidden">
+              <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  className={`absolute inset-0 w-full h-full object-cover ${bioStatus === "scanning-face" ? "opacity-100" : "opacity-0"}`} 
+              />
               {bioStatus === "idle" && <Camera className="w-8 h-8 text-zinc-600" />}
-              {bioStatus === "scanning" && (
-                <div className="absolute inset-0 bg-primary/20 flex flex-col items-center justify-center">
-                  <div className="w-full h-1 bg-primary/50 animate-pulse absolute top-1/2 shadow-[0_0_10px_#ef4444]" />
-                  <span className="text-xs text-primary font-bold z-10">SCANNING...</span>
+              {bioStatus === "scanning-face" && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/20">
+                  <div className="w-full h-1 bg-primary/80 animate-[ping_1.5s_infinite] absolute top-1/2 shadow-[0_0_15px_#ef4444]" />
+                </div>
+              )}
+              {bioStatus === "scanning-fingerprint" && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/60">
+                  <svg className="w-12 h-12 text-primary animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
                 </div>
               )}
               {bioStatus === "verified" && (
-                <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center transition-colors">
+                <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center transition-colors z-20">
                   <ShieldCheck className="w-10 h-10 text-emerald-400" />
                 </div>
               )}
@@ -114,18 +173,19 @@ export function AdvancedE2EDemo() {
            
            {bioStatus === "idle" && (
              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-4">
-                 <button onClick={simulateBiometric} className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/30 rounded-lg text-xs font-bold hover:bg-primary/20 transition-all">
+                 <button onClick={startFaceScan} className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/30 rounded-lg text-xs font-bold hover:bg-primary/20 transition-all">
                    <Camera className="w-3.5 h-3.5" /> Face ID
                  </button>
-                 <button onClick={simulateBiometric} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg text-xs font-bold hover:bg-zinc-700 hover:text-white transition-all">
+                 <button onClick={() => startHardwareAuth("platform")} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg text-xs font-bold hover:bg-zinc-700 hover:text-white transition-all">
                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg> Fingerprint
                  </button>
-                 <button onClick={simulateBiometric} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg text-xs font-bold hover:bg-zinc-700 hover:text-white transition-all">
+                 <button onClick={() => startHardwareAuth("cross-platform")} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg text-xs font-bold hover:bg-zinc-700 hover:text-white transition-all">
                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7 7 10 10-5 5V2l5 5-10 10"/></svg> Bluetooth Key
                  </button>
              </div>
            )}
-           {bioStatus === "verified" && <p className="text-xs text-emerald-400 font-bold">IDENTITY CONFIRMED. TRANSACTION CLEARED.</p>}
+           {bioStatus === "verified" && <p className="text-xs text-emerald-400 font-bold mt-4">IDENTITY CONFIRMED. TRANSACTION CLEARED.</p>}
+           {bioStatus === "error" && <p className="text-xs text-red-500 font-bold mt-4">AUTHENTICATION FAILED OR CANCELLED.</p>}
         </div>
       )}
 
