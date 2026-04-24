@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { PageTransition } from "@/components/page-transition";
 import { useRouter } from "next/navigation";
 import { getAuthSession } from "@/lib/auth-session";
+import { isInternalRole } from "@/lib/rbac";
 
 export default function AdminLayoutClient({ children }: { children: ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -13,17 +14,16 @@ export default function AdminLayoutClient({ children }: { children: ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    // Use cookie-based session (set by login + Google OAuth callback)
     const session = getAuthSession();
     if (!session) {
       router.replace("/login");
       return;
     }
-    if (session.role !== "admin") {
+    // Allow all internal hierarchy roles into the admin workspace
+    if (!isInternalRole(session.role)) {
       router.replace("/dashboard");
       return;
     }
-    // Sync to localStorage for backwards compat
     try {
       const existing = JSON.parse(localStorage.getItem("user") ?? "{}");
       if (!existing.email) {

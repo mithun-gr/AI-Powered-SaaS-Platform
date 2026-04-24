@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getDomainForEmail } from "@/lib/rbac";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
@@ -83,13 +84,33 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL("/login?error=no_email", origin));
     }
 
-    // 3. Determine role — check if it's the admin email, otherwise client
-    const role: "client" | "admin" =
-      googleUser.email === "admin@morchantra.com" ? "admin" : "client";
+
+    // 3. Determine role + domain — hierarchy mapping
+    const emailStr = googleUser.email.toLowerCase();
+    let role = "client";
+
+    const internalRoles: Record<string, string> = {
+      "founder@morchantra.com":    "founder",
+      "ceo@morchantra.com":        "ceo",
+      "cfo@morchantra.com":        "cfo",
+      "cto@morchantra.com":        "cto",
+      "admin@morchantra.com":      "supervisor",
+      "supervisor@morchantra.com": "supervisor",
+      "employee@morchantra.com":   "employee",
+    };
+
+    // Also map domain-specific supervisor/employee emails
+    if (emailStr.endsWith(".supervisor@morchantra.com")) role = "supervisor";
+    else if (emailStr.endsWith(".employee@morchantra.com")) role = "employee";
+    else if (internalRoles[emailStr]) role = internalRoles[emailStr];
+
+    // Resolve the service domain for this email
+    const domain = getDomainForEmail(emailStr);
 
     // 4. Build mrc_auth cookie payload
     const session = {
       role,
+      domain,
       email: googleUser.email,
       name:  googleUser.name || googleUser.email.split("@")[0],
       picture: googleUser.picture || "",
@@ -98,10 +119,11 @@ export async function GET(req: NextRequest) {
 
     // 5. Also persist in localStorage-compatible format
     const userPayload = {
-      email:  googleUser.email,
-      name:   googleUser.name || "",
+      email:   googleUser.email,
+      name:    googleUser.name || "",
       picture: googleUser.picture || "",
       role,
+      domain,
       provider: "google",
     };
 

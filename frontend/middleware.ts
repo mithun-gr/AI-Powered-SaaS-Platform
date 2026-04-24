@@ -65,6 +65,11 @@ function getAuthFromCookie(req: NextRequest): { role: string; email: string; exp
   }
 }
 
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function isInternalRole(role: string): boolean {
+  return ["founder", "ceo", "cfo", "cto", "supervisor", "employee", "admin"].includes(role);
+}
+
 // ── Proxy handler ────────────────────────────────────────────────────────────
 export default function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -78,7 +83,7 @@ export default function proxy(req: NextRequest) {
     const auth = getAuthFromCookie(req);
     if (auth && (pathname === "/login" || pathname === "/")) {
       return NextResponse.redirect(
-        new URL(auth.role === "admin" ? "/admin" : "/dashboard", req.url)
+        new URL(isInternalRole(auth.role) ? "/admin" : "/dashboard", req.url)
       );
     }
     return NextResponse.next();
@@ -88,7 +93,7 @@ export default function proxy(req: NextRequest) {
   if (pathname === "/") {
     const auth = getAuthFromCookie(req);
     return NextResponse.redirect(
-      new URL(auth ? (auth.role === "admin" ? "/admin" : "/dashboard") : "/login", req.url)
+      new URL(auth ? (isInternalRole(auth.role) ? "/admin" : "/dashboard") : "/login", req.url)
     );
   }
 
@@ -100,8 +105,8 @@ export default function proxy(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 5. Role guard — client can't reach /admin, admin gets redirected to /admin
-  if (isAdminPath(pathname) && auth.role !== "admin") {
+  // 5. Role guard — client can't reach /admin, internal gets redirected to /admin
+  if (isAdminPath(pathname) && !isInternalRole(auth.role)) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
