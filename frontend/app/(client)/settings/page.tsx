@@ -20,7 +20,7 @@ import { TrustedDevices } from "@/components/security/TrustedDevices";
 import { AuditLog } from "@/components/security/AuditLog";
 import { TwoFactorSetupModal } from "@/components/security/TwoFactorSetupModal";
 import { RemoveAuthenticatorModal } from "@/components/security/RemoveAuthenticatorModal";
-import { getAuthSession } from "@/lib/auth-session";
+import { getAuthSession, type UserRole } from "@/lib/auth-session";
 import { loadPlatformConfig, savePlatformConfig, DEFAULT_CONFIG, type PlatformConfig } from "@/lib/platform-config";
 import { generateBackupCodes, sendSecurityAlert, invalidateSessions, logSecurityEvent } from "@/lib/security-client";
 
@@ -234,7 +234,7 @@ function ControlRow({ label, desc, children }: { label: string; desc?: string; c
 export default function SettingsPage() {
   const { country, setCountry, currencyCode, isLoading: isCurrencyLoading } = useCurrency();
 
-  const [userRole, setUserRole]     = useState<"client" | "admin">("client");
+  const [userRole, setUserRole]     = useState<UserRole>("client");
   const [activeTab, setActiveTab]   = useState("profile");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");

@@ -18,16 +18,20 @@ const SHORT_MS     = 2 * 60 * 60 * 1000; // 2 hours
 // Slide threshold: renew cookie if less than 30 days remain (keeps it perpetually fresh)
 const SLIDE_THRESHOLD_MS = 30 * 24 * 60 * 60 * 1000;
 
+export type UserRole = "founder" | "ceo" | "cfo" | "cto" | "supervisor" | "employee" | "admin" | "client";
+
 export interface AuthSession {
-  role: "client" | "admin";
+  role: UserRole;
+  domain?: string;
   email: string;
   name: string;
+  picture?: string;
   exp: number;
 }
 
 /** Write (or renew) the auth cookie */
 export function setAuthCookie(
-  role: "client" | "admin",
+  role: UserRole,
   email: string,
   name: string,
   rememberMe = true
