@@ -68,6 +68,7 @@ export default function DashboardLayoutClient({ children }: { children: ReactNod
             <PageTransition>{children}</PageTransition>
           </div>
         </main>
+      </div>
       <GlobalLimitModal />
       <CommandPalette />
     </div>
