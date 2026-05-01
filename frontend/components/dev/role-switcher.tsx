@@ -158,7 +158,7 @@ export function RoleSwitcher() {
         >
           <div className={`w-2 h-2 rounded-full ${current.dot} shadow-[0_0_8px_currentColor]`} />
           <span className="text-xs font-bold text-zinc-300 group-hover:text-white transition-colors">
-            {current.emoji} {current.label}
+            DEV: Switch Role ({current.label})
           </span>
           <Eye className="w-3 h-3 text-zinc-500 group-hover:text-primary transition-colors" />
         </motion.button>
