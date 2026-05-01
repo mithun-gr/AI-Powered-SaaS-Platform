@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { getAuthSession } from "@/lib/auth-session";
 import { isInternalRole } from "@/lib/rbac";
 import { DashboardSkeleton } from "@/components/layout/dashboard-skeleton";
+import { RoleSwitcher } from "@/components/dev/role-switcher";
 
 export default function AdminLayoutClient({ children }: { children: ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -51,6 +52,7 @@ export default function AdminLayoutClient({ children }: { children: ReactNode })
           </div>
         </main>
       </div>
+      <RoleSwitcher />
     </div>
   );
 }
