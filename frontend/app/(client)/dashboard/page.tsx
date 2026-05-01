@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { dashboardMetrics, recentRequests, pricingTiers } from "@/lib/dummy-data";
 import { fadeIn, staggerContainer } from "@/lib/animations";
 import { AdvancedE2EDemo } from "@/components/e2e-demo-module";
+import { BIPanel } from "@/components/dashboard/bi-panel";
 import { UserRole } from "@/lib/auth-session";
 import { getAuthSession } from "@/lib/auth-session";
 import { NotificationBell } from "@/components/client/NotificationBell";
@@ -588,8 +589,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Business Intelligence Panel — Real-time chart + AI Insights */}
+      <BIPanel />
+
       {/* Advanced E2E Innovation Lab */}
-      <div className="mt-6">
+      <div className="mt-2">
         <AdvancedE2EDemo />
       </div>
 
