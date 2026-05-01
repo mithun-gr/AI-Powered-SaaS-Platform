@@ -95,13 +95,15 @@ function SidebarUserFooter({ session }: { session: SessionData | null }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <p className="text-xs font-semibold text-foreground truncate">{name}</p>
-            {/* Role badge */}
-            <span className={cn(
-              "text-[9px] font-bold px-1 py-0.5 rounded border leading-none shrink-0",
-              roleMeta.color
-            )}>
-              {roleMeta.label}
-            </span>
+            {/* Role badge — only shown for internal hierarchy roles */}
+            {isInternalRole(role) && (
+              <span className={cn(
+                "text-[9px] font-bold px-1 py-0.5 rounded border leading-none shrink-0",
+                roleMeta.color
+              )}>
+                {roleMeta.label}
+              </span>
+            )}
           </div>
           <p className="text-[10px] text-muted-foreground truncate">{email}</p>
           {/* Domain badge — only shown for scoped roles */}
@@ -258,12 +260,14 @@ export function Sidebar({ isAdmin = false, isMobileOpen = false, onMobileClose }
             </h1>
           </Link>
           <div className="flex items-center gap-1.5">
-            <span className={cn(
-              "px-2 py-0.5 rounded text-xs border font-bold leading-none",
-              roleMeta.color
-            )}>
-              {roleMeta.label}
-            </span>
+            {isInternalRole(role) && (
+              <span className={cn(
+                "px-2 py-0.5 rounded text-xs border font-bold leading-none",
+                roleMeta.color
+              )}>
+                {roleMeta.label}
+              </span>
+            )}
             {mobile && (
               <button onClick={onMobileClose} className="text-muted-foreground hover:text-white ml-1">
                 <X className="h-5 w-5" />
