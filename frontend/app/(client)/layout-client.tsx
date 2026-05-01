@@ -8,6 +8,7 @@ import { GlobalLimitModal } from "@/components/global-limit-modal";
 import { CommandPalette } from "@/components/command-palette";
 import { useRouter, usePathname } from "next/navigation";
 import { getAuthSession, clearAuthCookie } from "@/lib/auth-session";
+import { isInternalRole } from "@/lib/rbac";
 
 export default function DashboardLayoutClient({ children }: { children: ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -24,9 +25,9 @@ export default function DashboardLayoutClient({ children }: { children: ReactNod
       return;
     }
 
-    // Layer 2: Validate role
-    // ALLOW Admins to access /settings but redirect them from other client pages
-    if (session.role === "admin" && pathname !== "/settings") {
+    // Layer 2: Validate role — redirect all internal hierarchy roles to /admin
+    // Allow internal roles to reach /settings only
+    if (isInternalRole(session.role) && pathname !== "/settings") {
       router.replace("/admin");
       return;
     }
@@ -59,7 +60,7 @@ export default function DashboardLayoutClient({ children }: { children: ReactNod
 
   // Determine if we should show the Admin or Client sidebar based on actual user role
   const userSession = getAuthSession();
-  const isAdmin = userSession?.role === "admin";
+  const isAdmin = isInternalRole(userSession?.role ?? "client");
 
   return (
     <div className="min-h-screen bg-background">
