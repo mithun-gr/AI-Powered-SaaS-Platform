@@ -9,6 +9,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { useRouter, usePathname } from "next/navigation";
 import { getAuthSession, clearAuthCookie } from "@/lib/auth-session";
 import { isInternalRole } from "@/lib/rbac";
+import { DashboardSkeleton } from "@/components/layout/dashboard-skeleton";
 
 export default function DashboardLayoutClient({ children }: { children: ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -47,16 +48,7 @@ export default function DashboardLayoutClient({ children }: { children: ReactNod
     setIsVerified(true);
   }, [router, pathname]);
 
-  if (!isVerified) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-white">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-          <p className="text-xs text-muted-foreground tracking-widest uppercase italic">Authenticating Session...</p>
-        </div>
-      </div>
-    );
-  }
+  if (!isVerified) return <DashboardSkeleton />;
 
   // Determine if we should show the Admin or Client sidebar based on actual user role
   const userSession = getAuthSession();

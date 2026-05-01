@@ -7,6 +7,7 @@ import { PageTransition } from "@/components/page-transition";
 import { useRouter } from "next/navigation";
 import { getAuthSession } from "@/lib/auth-session";
 import { isInternalRole } from "@/lib/rbac";
+import { DashboardSkeleton } from "@/components/layout/dashboard-skeleton";
 
 export default function AdminLayoutClient({ children }: { children: ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -33,16 +34,7 @@ export default function AdminLayoutClient({ children }: { children: ReactNode })
     setIsVerified(true);
   }, [router]);
 
-  if (!isVerified) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-          <p className="text-xs text-muted-foreground tracking-widest uppercase">Verifying session</p>
-        </div>
-      </div>
-    );
-  }
+  if (!isVerified) return <DashboardSkeleton />;
 
   return (
     <div className="min-h-screen bg-background">
