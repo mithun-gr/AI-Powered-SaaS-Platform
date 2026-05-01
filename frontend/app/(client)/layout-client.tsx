@@ -10,7 +10,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { getAuthSession, clearAuthCookie } from "@/lib/auth-session";
 import { isInternalRole } from "@/lib/rbac";
 import { DashboardSkeleton } from "@/components/layout/dashboard-skeleton";
-import { RoleSwitcher } from "@/components/dev/role-switcher";
 
 export default function DashboardLayoutClient({ children }: { children: ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -69,8 +68,6 @@ export default function DashboardLayoutClient({ children }: { children: ReactNod
             <PageTransition>{children}</PageTransition>
           </div>
         </main>
-      </div>
-      <RoleSwitcher />
       <GlobalLimitModal />
       <CommandPalette />
     </div>

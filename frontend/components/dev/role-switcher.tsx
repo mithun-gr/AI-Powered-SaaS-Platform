@@ -67,26 +67,6 @@ const ROLES = [
     workspace: "/admin",
     emoji: "👔",
   },
-  {
-    role: "employee",
-    label: "Employee",
-    desc: "Basic: clients & requests only",
-    color: "from-zinc-500 to-slate-500",
-    badge: "bg-zinc-500/20 text-zinc-400 border-zinc-700",
-    dot: "bg-zinc-400",
-    workspace: "/admin",
-    emoji: "🧑‍💼",
-  },
-  {
-    role: "client",
-    label: "Client",
-    desc: "Customer portal view",
-    color: "from-rose-500 to-pink-500",
-    badge: "bg-rose-500/20 text-rose-400 border-rose-500/30",
-    dot: "bg-rose-400",
-    workspace: "/dashboard",
-    emoji: "👤",
-  },
 ] as const;
 
 type RoleKey = (typeof ROLES)[number]["role"];
@@ -107,18 +87,18 @@ function setCookieRole(role: RoleKey, currentEmail: string, currentName: string)
 function getCurrentRoleFromCookie(): RoleKey {
   try {
     const match = document.cookie.split("; ").find(r => r.startsWith("mrc_auth="));
-    if (!match) return "client";
+    if (!match) return "founder";
     const raw = match.split("=").slice(1).join("=");
     for (const attempt of [raw, decodeURIComponent(raw)]) {
-      try { const p = JSON.parse(attempt); if (p?.role) return p.role as RoleKey; } catch {}
+      try { const p = JSON.parse(attempt); if (p?.role && ROLES.some(r => r.role === p.role)) return p.role as RoleKey; } catch {}
     }
   } catch {}
-  return "client";
+  return "founder";
 }
 
 export function RoleSwitcher() {
   const [open, setOpen] = useState(false);
-  const [activeRole, setActiveRole] = useState<RoleKey>("client");
+  const [activeRole, setActiveRole] = useState<RoleKey>("founder");
   const [switching, setSwitching] = useState<RoleKey | null>(null);
   const router = useRouter();
 
@@ -146,14 +126,12 @@ export function RoleSwitcher() {
     } catch {}
 
     // Assign mapped name by role for clarity
-    const roleNames: Record<RoleKey, string> = {
+      const roleNames: Record<RoleKey, string> = {
       founder: "Alex Morchantra",
       ceo: "Sarah Johnson",
       cfo: "Michael Chen",
       cto: "Priya Patel",
       supervisor: "Legal Supervisor",
-      employee: "Team Member",
-      client: "Demo Client",
     };
 
     setCookieRole(roleDef.role, email, roleNames[roleDef.role]);
@@ -166,7 +144,7 @@ export function RoleSwitcher() {
     router.refresh();
   };
 
-  const current = ROLES.find(r => r.role === activeRole) ?? ROLES[6];
+  const current = ROLES.find(r => r.role === activeRole) ?? ROLES[0];
 
   return (
     <>
